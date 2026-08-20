@@ -21,7 +21,7 @@ The same generated `data/nodes.csv` and `data/ratings.csv` inputs are used for e
 ## Methodology
 
 - Same client machine and nearest comparable region for every platform.
-- Entry tiers chosen as close as possible to CognoDB c0 (0.5 vCPU, 256 MB RAM, 1 GB disk).
+- Entry tiers chosen as close as possible to CognoDB c0 (its console reports a 1 GiB standalone instance; CPU and RAM limits are not published in the available instance details).
 - 20 unmeasured warm-up operations, then 100 measured iterations per read workload.
 - Client-observed p50 and p95 latency (ms), not averages alone.
 - Failed connections, timeouts, throttling, and unobservable metrics are retained and reported.
@@ -29,7 +29,7 @@ The same generated `data/nodes.csv` and `data/ratings.csv` inputs are used for e
 
 | Platform | Target tier / region | vCPU | RAM | Disk | Run status |
 |---|---|---:|---:|---:|---|
-| CognoDB | c0 / region not recorded | 0.5 | 256 MB | 1 GB | completed |
+| CognoDB | c0 Standalone / N. Virginia (us-east4) | not published | not published | 1 GiB | completed |
 | Neo4j AuraDB | Google Cloud / Mumbai (asia-south1) | 1 | 2 GB | 4 GB | completed; larger than CognoDB c0 |
 | Memgraph Cloud | Asia Pacific / Sydney | 2 | 2 GB | 14 GB used | completed; larger than CognoDB c0 |
 | FalkorDB Cloud | region not recorded | pending | pending | pending | completed |
