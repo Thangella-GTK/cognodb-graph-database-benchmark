@@ -1,0 +1,55 @@
+# Copy this file to configs/local.yml before changing regions, tiers, or endpoints.
+# Secrets are environment-variable names, never credential values.
+run:
+  seed: 20260820
+  client_region: "record the region of the machine running this command"
+  cold_run: false
+
+dataset:
+  name: movielens-100k
+  source_url: https://files.grouplens.org/datasets/movielens/ml-100k.zip
+  local_zip: data/ml-100k.zip
+  extracted_dir: data/ml-100k
+
+workload:
+  warmup_iterations: 20
+  iterations: 100
+  concurrency_sweep: [1, 10, 40]
+  read_write_mix: {reads: 90, writes: 10}
+  request_timeout_s: 30
+
+# CognoDB plus four comparison targets. Select truly comparable instances and record
+# their advertised resources in README before interpreting any result.
+platforms:
+  - name: cognodb
+    driver: neo4j
+    env_uri: COGNODB_URI
+    env_user: COGNODB_USER
+    env_pass: COGNODB_PASS
+    tier: "CognoDB c0; record actual vCPU/RAM/disk and region"
+  - name: neo4j
+    driver: neo4j
+    env_uri: NEO4J_URI
+    env_user: NEO4J_USER
+    env_pass: NEO4J_PASS
+    tier: "record comparable entry tier vCPU/RAM/disk and region"
+  - name: memgraph
+    driver: neo4j
+    env_uri: MEMGRAPH_URI
+    env_user: MEMGRAPH_USER
+    env_pass: MEMGRAPH_PASS
+    tier: "record comparable entry tier vCPU/RAM/disk and region"
+  - name: falkordb
+    driver: redisgraph
+    env_uri: FALKORDB_URI
+    tier: "record comparable entry tier vCPU/RAM/disk and region"
+  - name: dgraph
+    driver: dgraph
+    env_uri: DGRAPH_URI
+    tier: "record comparable entry tier vCPU/RAM/disk and region"
+  - name: tigergraph
+    driver: tigergraph
+    env_uri: TIGERGRAPH_URI
+    env_token: TIGERGRAPH_TOKEN
+    graph_name: movielens
+    tier: "record comparable entry tier vCPU/RAM/disk and region"
