@@ -30,7 +30,7 @@ The same generated `data/nodes.csv` and `data/ratings.csv` inputs are used for e
 | Platform | Target tier / region | vCPU | RAM | Disk | Run status |
 |---|---|---:|---:|---:|---|
 | CognoDB | c0 / region not recorded | 0.5 | 256 MB | 1 GB | completed |
-| Neo4j AuraDB | pending | pending | pending | pending | credentials required |
+| Neo4j AuraDB | region not recorded | pending | pending | pending | completed |
 | Memgraph Cloud | region not recorded | pending | pending | pending | completed |
 | FalkorDB Cloud | region not recorded | pending | pending | pending | completed |
 | TigerGraph Cloud | excluded | — | — | — | paid/non-comparable workspace unavailable |
@@ -87,7 +87,7 @@ The orchestrator writes local evidence to `results/results.json`, followed by `r
 | Platform | Ingest rel/s | 1-hop p50/p95 | 2-hop p50/p95 | 3-hop p50/p95 | Lookup p50/p95 | Aggregation p50/p95 | Mixed ops/s (1/10/40) |
 |---|---:|---|---|---|---|---|---|
 | CognoDB | 538.29 | 229.99 / 252.76 ms | 234.51 / 257.49 ms | 234.31 / 239.95 ms | 230.17 / 234.49 ms | 407.97 / 480.64 ms | 1.85 / 10.47 / 11.70 |
-| Neo4j | pending | pending | pending | pending | pending | pending | pending |
+| Neo4j | 3,247.98 | 22.28 / 32.80 ms | 24.14 / 41.04 ms | 22.45 / 33.84 ms | 22.78 / 32.32 ms | 71.13 / 110.88 ms | 10.12 / 31.68 / 29.87 |
 | Memgraph | 505.95 | 250.34 / 267.52 ms | 250.43 / 263.17 ms | 250.36 / 265.19 ms | 250.87 / 302.62 ms | 286.29 / 318.04 ms | 0.66 / 12.73 / 23.12 |
 | FalkorDB | 891.77 | 24.41 / 31.99 ms | 24.64 / 28.67 ms | 25.20 / 31.34 ms | 22.98 / 26.14 ms | 47.67 / 63.42 ms | 17.01 / 48.05 / 14.29 |
 | TigerGraph | excluded | — | — | — | — | — | paid/non-comparable tier unavailable |
@@ -103,6 +103,8 @@ The completed CognoDB c0 run loaded 100,000 relationships in 185.77 seconds (538
 The completed FalkorDB run loaded 100,000 relationships in 112.14 seconds (891.77 relationships/s). Its bounded traversal and lookup p50 latencies were 23–25 ms, while aggregation p50 was 47.67 ms. Mixed-workload throughput peaked at 48.05 operations/s at concurrency 10 and declined at concurrency 40, a pattern consistent with saturation or shared-tier throttling. This is an observation from one client, one run, and non-identical instance resources; it is not a general product ranking.
 
 The completed Memgraph run loaded 100,000 relationships in 197.65 seconds (505.95 relationships/s). Its p50 traversal/lookup values were approximately 250 ms and aggregation p50 was 286.29 ms. Mixed-workload throughput rose from 0.66 operations/s at concurrency 1 to 23.12 operations/s at concurrency 40. Memgraph reported compatibility warnings that named constraint/index identifiers are ignored; the logical labels and properties used by the workload remained present. These results are still a single-run observation and must be interpreted with the documented service-tier differences.
+
+The Neo4j AuraDB run loaded 100,000 relationships in 30.79 seconds (3,247.98 relationships/s). Bounded traversal and lookup p50 latencies were approximately 22–24 ms, with aggregation p50 of 71.13 ms. Its mixed workload reached 31.68 operations/s at concurrency 10 and slightly declined to 29.87 operations/s at concurrency 40, while p95 latency increased to 110.78 ms. An earlier mixed-workload attempt timed out; a clean subsequent sweep completed, so both the earlier transient failure and completed retry should be retained in local run notes.
 
 ## Security
 
