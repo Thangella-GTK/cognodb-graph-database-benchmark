@@ -8,7 +8,7 @@ A reproducible benchmark harness for comparing CognoDB Cloud with managed graph 
 
 Created for the Wexa AI graph-database benchmarking assessment, this project prioritizes fair methodology, reproducible automation, and honest reporting over declaring a database “winner.”
 
-The active benchmark configuration targets CognoDB Cloud, Neo4j AuraDB, Memgraph Cloud, and FalkorDB Cloud. Dgraph and TigerGraph adapters remain in the codebase but are excluded from the active run because a comparable no-cost tier was not available in time.
+The active benchmark configuration targets CognoDB Cloud, Neo4j AuraDB, Memgraph Cloud, and FalkorDB Cloud. Dgraph and TigerGraph adapters remain in the codebase but are excluded from the active run. The available TigerGraph Savanna workspace did not expose a discoverable public RESTPP endpoint/token workflow or a compatible automated loading-job route in its UI, so it could not be integrated honestly with this harness before the deadline.
 
 ## Dataset and model
 
@@ -33,7 +33,7 @@ The same generated `data/nodes.csv` and `data/ratings.csv` inputs are used for e
 | Neo4j AuraDB | Google Cloud / Mumbai (asia-south1) | 1 | 2 GB | 4 GB | completed; larger than CognoDB c0 |
 | Memgraph Cloud | Asia Pacific / Sydney | 2 | 2 GB | 14 GB used | completed; larger than CognoDB c0 |
 | FalkorDB Cloud | AWS / Mumbai (ap-south-1a), public standalone; FalkorDB v4.20.1 | not published | not published | not published | completed; HA, backups, and autoscaling disabled |
-| TigerGraph Cloud | excluded | — | — | — | paid/non-comparable workspace unavailable |
+| TigerGraph Savanna | AWS / Mumbai (ap-south-1), TG-00 (16 GiB) | not comparable | 16 GiB plan | not published | excluded: available UI did not expose the endpoint, token, and loading-job path required by this automated harness |
 
 ## Workloads and metrics
 
@@ -94,7 +94,7 @@ The orchestrator writes local evidence to `results/results.json`, followed by `r
 
 ## Limitations
 
-Free tiers may throttle, suspend, or share hardware. Cloud results include client-to-service network latency. Indexing, query syntax, and observability differ across providers. TigerGraph requires a graph schema, loading job, and stored RESTPP queries and its accessible workspace was not comparable to CognoDB c0. A missing or failed target is incomplete evidence, not a basis for inferring performance.
+Free tiers may throttle, suspend, or share hardware. Cloud results include client-to-service network latency. Indexing, query syntax, and observability differ across providers. The available TigerGraph Savanna workspace was a 16 GiB tier, materially larger than CognoDB c0, and did not expose a discoverable public RESTPP endpoint/token workflow or compatible loading-job path in its UI. It was therefore excluded rather than assigned fabricated or manually incomparable results. This repository reports four completed platforms (CognoDB plus Neo4j, Memgraph, and FalkorDB), one short of the assessment's requested CognoDB-plus-four-competitors target.
 
 ## Initial observation
 
