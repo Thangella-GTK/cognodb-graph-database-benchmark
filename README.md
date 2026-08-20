@@ -32,7 +32,7 @@ The same generated `data/nodes.csv` and `data/ratings.csv` inputs are used for e
 | CognoDB | c0 Standalone / N. Virginia (us-east4) | not published | not published | 1 GiB | completed |
 | Neo4j AuraDB | Google Cloud / Mumbai (asia-south1) | 1 | 2 GB | 4 GB | completed; larger than CognoDB c0 |
 | Memgraph Cloud | Asia Pacific / Sydney | 2 | 2 GB | 14 GB used | completed; larger than CognoDB c0 |
-| FalkorDB Cloud | region not recorded | pending | pending | pending | completed |
+| FalkorDB Cloud | AWS / Mumbai (ap-south-1a), public standalone; FalkorDB v4.20.1 | not published | not published | not published | completed; HA, backups, and autoscaling disabled |
 | TigerGraph Cloud | excluded | — | — | — | paid/non-comparable workspace unavailable |
 
 ## Workloads and metrics
