@@ -8,7 +8,7 @@ A reproducible benchmark harness for comparing CognoDB Cloud with managed graph 
 
 Created for the Wexa AI graph-database benchmarking assessment, this project prioritizes fair methodology, reproducible automation, and honest reporting over declaring a database “winner.”
 
-Targets: CognoDB Cloud, Neo4j AuraDB, Memgraph Cloud, FalkorDB Cloud, and TigerGraph Cloud. Dgraph is included as an optional sixth adapter.
+The active benchmark configuration targets CognoDB Cloud, Neo4j AuraDB, Memgraph Cloud, and FalkorDB Cloud. Dgraph and TigerGraph adapters remain in the codebase but are excluded from the active run because a comparable no-cost tier was not available in time.
 
 ## Dataset and model
 
@@ -33,7 +33,7 @@ The same generated `data/nodes.csv` and `data/ratings.csv` inputs are used for e
 | Neo4j AuraDB | pending | pending | pending | pending | credentials required |
 | Memgraph Cloud | pending | pending | pending | pending | connection verification pending |
 | FalkorDB Cloud | pending | pending | pending | pending | endpoint verified; benchmark pending |
-| TigerGraph Cloud | pending | pending | pending | pending | account/schema/token required |
+| TigerGraph Cloud | excluded | — | — | — | paid/non-comparable workspace unavailable |
 
 ## Workloads and metrics
 
@@ -67,7 +67,7 @@ python scripts/export_results_csv.py
 python scripts/plot_results.py
 ```
 
-For account creation, URI formats, credentials, and TigerGraph setup, see the [platform setup guide](docs/setup-guide.md). `.env`, datasets, and generated results are excluded from Git.
+For account creation and URI formats, see the [platform setup guide](docs/setup-guide.md). `.env`, datasets, and generated results are excluded from Git.
 
 ## Repository layout
 
@@ -90,11 +90,11 @@ The orchestrator writes local evidence to `results/results.json`, followed by `r
 | Neo4j | pending | pending | pending | pending | pending | pending | pending |
 | Memgraph | pending | pending | pending | pending | pending | pending | pending |
 | FalkorDB | pending | pending | pending | pending | pending | pending | pending |
-| TigerGraph | pending | pending | pending | pending | pending | pending | pending |
+| TigerGraph | excluded | — | — | — | — | — | paid/non-comparable tier unavailable |
 
 ## Limitations
 
-Free tiers may throttle, suspend, or share hardware. Cloud results include client-to-service network latency. Indexing, query syntax, and observability differ across providers. TigerGraph also requires a graph schema, loading job, and stored RESTPP queries before it can be benchmarked. A missing or failed target is incomplete evidence, not a basis for inferring performance.
+Free tiers may throttle, suspend, or share hardware. Cloud results include client-to-service network latency. Indexing, query syntax, and observability differ across providers. TigerGraph requires a graph schema, loading job, and stored RESTPP queries and its accessible workspace was not comparable to CognoDB c0. A missing or failed target is incomplete evidence, not a basis for inferring performance.
 
 ## Security
 

@@ -18,7 +18,7 @@ workload:
   read_write_mix: {reads: 90, writes: 10}
   request_timeout_s: 30
 
-# CognoDB plus four comparison targets. Select truly comparable instances and record
+# CognoDB plus the currently available comparison targets. Select truly comparable instances and record
 # their advertised resources in README before interpreting any result.
 platforms:
   - name: cognodb
@@ -42,14 +42,4 @@ platforms:
   - name: falkordb
     driver: redisgraph
     env_uri: FALKORDB_URI
-    tier: "record comparable entry tier vCPU/RAM/disk and region"
-  - name: dgraph
-    driver: dgraph
-    env_uri: DGRAPH_URI
-    tier: "record comparable entry tier vCPU/RAM/disk and region"
-  - name: tigergraph
-    driver: tigergraph
-    env_uri: TIGERGRAPH_URI
-    env_token: TIGERGRAPH_TOKEN
-    graph_name: movielens
     tier: "record comparable entry tier vCPU/RAM/disk and region"

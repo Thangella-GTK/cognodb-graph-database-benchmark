@@ -25,6 +25,12 @@ class Neo4jRunner(PlatformRunner):
     def load(self, nodes_csv, edges_csv, batch=1_000):
         started = perf_counter(); nodes = edges = 0
         with self.driver.session() as session:
+            # Each benchmark is a fresh load. Clear previous benchmark data so
+            # repeated runs do not measure an increasingly expensive MERGE.
+            while True:
+                summary = session.run("MATCH (n) WITH n LIMIT 10000 DETACH DELETE n RETURN count(*) AS deleted").single()
+                if not summary or summary["deleted"] == 0:
+                    break
             # Labels are intentionally part of the physical schema: every workload below relies on them.
             session.run("CREATE CONSTRAINT user_id IF NOT EXISTS FOR (u:User) REQUIRE u.id IS UNIQUE").consume()
             session.run("CREATE CONSTRAINT movie_id IF NOT EXISTS FOR (m:Movie) REQUIRE m.id IS UNIQUE").consume()
@@ -53,7 +59,7 @@ class Neo4jRunner(PlatformRunner):
     @staticmethod
     def _edges_tx(tx, rows):
         tx.run("UNWIND $rows AS r MATCH (u:User {id:'u'+r.user_id}), (m:Movie {id:'m'+r.movie_id}) "
-               "MERGE (u)-[e:RATED]->(m) SET e.rating=toInteger(r.rating), e.ts=toInteger(r.timestamp)", rows=rows).consume()
+               "CREATE (u)-[:RATED {rating:toInteger(r.rating), ts:toInteger(r.timestamp)}]->(m)", rows=rows).consume()
 
     def _time(self, query, **params):
         with self.driver.session() as session:
@@ -66,8 +72,16 @@ class Neo4jRunner(PlatformRunner):
     def run_traversal(self, depth, iterations):
         ids = self._user_ids()
         if not ids: return []
-        pattern = {1: "(u)-[:RATED]->(:Movie)", 2: "(u)-[:RATED]->(:Movie)<-[:RATED]-(:User)", 3: "(u)-[:RATED]->(:Movie)<-[:RATED]-(:User)-[:RATED]->(:Movie)"}[depth]
-        return [self._time(f"MATCH {pattern} WHERE u.id=$id RETURN count(*)", id=random.choice(ids)) for _ in range(iterations)]
+        # Bound expansions to 1,000 rows. Without a common cap, a 3-hop path on
+        # MovieLens can explode combinatorially and turn a cloud timeout into a
+        # misleading engine comparison. Apply this same cap in every adapter.
+        patterns = {
+            1: "MATCH (u:User {id:$id})-[:RATED]->(target:Movie)",
+            2: "MATCH (u:User {id:$id})-[:RATED]->(:Movie)<-[:RATED]-(target:User)",
+            3: "MATCH (u:User {id:$id})-[:RATED]->(:Movie)<-[:RATED]-(:User)-[:RATED]->(target:Movie)",
+        }
+        query = patterns[depth] + " WITH target LIMIT 1000 RETURN count(*)"
+        return [self._time(query, id=random.choice(ids)) for _ in range(iterations)]
 
     def run_lookup(self, iterations):
         return [self._time("MATCH (m:Movie {id:$id}) RETURN m.title", id=f"m{random.randint(1,1682)}") for _ in range(iterations)]

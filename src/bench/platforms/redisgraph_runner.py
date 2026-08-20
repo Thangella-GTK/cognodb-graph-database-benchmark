@@ -47,6 +47,19 @@ class RedisGraphRunner:
 
     def load(self, nodes_csv: str, edges_csv: str, batch: int = 500):
         import csv
+        started = perf_counter()
+        nodes = edges = 0
+        try:
+            self.client.execute_command('GRAPH.DELETE', self.graph_name)
+        except Exception:
+            pass
+
+        def flush(queries):
+            pipe = self.client.pipeline(transaction=False)
+            for query in queries:
+                pipe.execute_command('GRAPH.QUERY', self.graph_name, query)
+            pipe.execute()
+
         # Create nodes
         with open(nodes_csv, newline='', encoding='utf-8') as f:
             rdr = csv.DictReader(f)
@@ -60,14 +73,12 @@ class RedisGraphRunner:
                     q = f"CREATE (:Movie {{id:\'{rid}\', title:\'{title}\'}})"
                 qbatch.append(q)
                 if len(qbatch) >= batch:
-                    # RedisGraph does not support multi-statement queries via GRAPH.QUERY;
-                    # send statements individually to avoid "more than one statement" errors.
-                    for qq in qbatch:
-                        self._run_query(qq)
+                    flush(qbatch)
+                    nodes += len(qbatch)
                     qbatch = []
             if qbatch:
-                for qq in qbatch:
-                    self._run_query(qq)
+                flush(qbatch)
+                nodes += len(qbatch)
 
         # Edges
         with open(edges_csv, newline='', encoding='utf-8') as f:
@@ -80,12 +91,17 @@ class RedisGraphRunner:
                 q = f"MATCH (u:User {{id:\'{uid}\'}}),(m:Movie {{id:\'{mid}\'}}) CREATE (u)-[:RATED {{rating:{rating}}}]->(m)"
                 qbatch.append(q)
                 if len(qbatch) >= batch:
-                    for qq in qbatch:
-                        self._run_query(qq)
+                    flush(qbatch)
+                    edges += len(qbatch)
                     qbatch = []
             if qbatch:
-                for qq in qbatch:
-                    self._run_query(qq)
+                flush(qbatch)
+                edges += len(qbatch)
+        seconds = perf_counter() - started
+        return {'wall_clock_s': seconds, 'nodes': nodes, 'relationships': edges,
+                'nodes_per_s': nodes / seconds if seconds else None,
+                'relationships_per_s': edges / seconds if seconds else None,
+                'method': 'FalkorDB GRAPH.QUERY pipelined batches of 500'}
 
     def run_traversal(self, depth: int, iterations: int, sample_nodes: List[str] = None):
         lat = []
