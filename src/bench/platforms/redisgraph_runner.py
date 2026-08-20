@@ -27,7 +27,9 @@ class RedisGraphRunner:
         uri = self.env.get('uri') or os.environ.get('REDISGRAPH_URI') or os.environ.get('FALKORDB_URI')
         if not uri:
             raise RuntimeError('REDISGRAPH_URI not set')
-        self.client = redis.from_url(uri, socket_connect_timeout=30, socket_timeout=30)
+        # Bulk graph creation can legitimately exceed a short query socket
+        # timeout on a shared cloud instance; connection setup remains bounded.
+        self.client = redis.from_url(uri, socket_connect_timeout=30, socket_timeout=180)
         self.client.ping()
 
     def close(self):
@@ -114,16 +116,18 @@ class RedisGraphRunner:
                 res = self._run_query("MATCH (u:User) RETURN u.id LIMIT 1")
                 try:
                     uid = res[1][0][0]
+                    if isinstance(uid, bytes):
+                        uid = uid.decode('utf-8')
                 except Exception:
                     uid = None
             if not uid:
                 continue
             patterns = {
-                1: "-[:RATED]->(:Movie)",
-                2: "-[:RATED]->(:Movie)<-[:RATED]-(:User)",
-                3: "-[:RATED]->(:Movie)<-[:RATED]-(:User)-[:RATED]->(:Movie)",
+                1: "-[:RATED]->(target:Movie)",
+                2: "-[:RATED]->(:Movie)<-[:RATED]-(target:User)",
+                3: "-[:RATED]->(:Movie)<-[:RATED]-(:User)-[:RATED]->(target:Movie)",
             }
-            q = f"MATCH (u:User {{id:'{uid}'}}){patterns[depth]} RETURN count(*)"
+            q = f"MATCH (u:User {{id:'{uid}'}}){patterns[depth]} WITH target LIMIT 1000 RETURN count(*)"
             t0 = perf_counter()
             self._run_query(q)
             t1 = perf_counter()
@@ -171,3 +175,6 @@ class RedisGraphRunner:
                 else:
                     res.append(r)
         return res
+
+    def footprint(self):
+        return {'status': 'not_observable', 'note': 'Record console-reported storage and instance specs in README.'}

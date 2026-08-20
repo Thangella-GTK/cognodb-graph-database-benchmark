@@ -23,6 +23,10 @@ class Neo4jRunner(PlatformRunner):
         return session.execute_write(fn, rows) if hasattr(session, "execute_write") else session.write_transaction(fn, rows)
 
     def load(self, nodes_csv, edges_csv, batch=1_000):
+        # Managed Memgraph has materially higher per-request latency from this
+        # client; fewer larger UNWIND batches keep the logical load identical.
+        if self.name.lower() == "memgraph":
+            batch = 5_000
         started = perf_counter(); nodes = edges = 0
         with self.driver.session() as session:
             # Each benchmark is a fresh load. Clear previous benchmark data so
