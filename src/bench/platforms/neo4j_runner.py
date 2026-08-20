@@ -51,7 +51,7 @@ class Neo4jRunner(PlatformRunner):
         seconds = perf_counter() - started
         return {"wall_clock_s": seconds, "nodes": nodes, "relationships": edges,
                 "nodes_per_s": nodes / seconds if seconds else None, "relationships_per_s": edges / seconds if seconds else None,
-                "method": "Bolt driver UNWIND batches of 1000"}
+                "method": f"Bolt driver UNWIND batches of {batch}"}
 
     @staticmethod
     def _nodes_tx(tx, rows):

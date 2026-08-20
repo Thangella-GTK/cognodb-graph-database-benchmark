@@ -31,7 +31,7 @@ The same generated `data/nodes.csv` and `data/ratings.csv` inputs are used for e
 |---|---|---:|---:|---:|---|
 | CognoDB | c0 / region not recorded | 0.5 | 256 MB | 1 GB | completed |
 | Neo4j AuraDB | pending | pending | pending | pending | credentials required |
-| Memgraph Cloud | pending | pending | pending | pending | connection verification pending |
+| Memgraph Cloud | region not recorded | pending | pending | pending | completed |
 | FalkorDB Cloud | region not recorded | pending | pending | pending | completed |
 | TigerGraph Cloud | excluded | — | — | — | paid/non-comparable workspace unavailable |
 
@@ -88,7 +88,7 @@ The orchestrator writes local evidence to `results/results.json`, followed by `r
 |---|---:|---|---|---|---|---|---|
 | CognoDB | 538.29 | 229.99 / 252.76 ms | 234.51 / 257.49 ms | 234.31 / 239.95 ms | 230.17 / 234.49 ms | 407.97 / 480.64 ms | 1.85 / 10.47 / 11.70 |
 | Neo4j | pending | pending | pending | pending | pending | pending | pending |
-| Memgraph | pending | pending | pending | pending | pending | pending | pending |
+| Memgraph | 505.95 | 250.34 / 267.52 ms | 250.43 / 263.17 ms | 250.36 / 265.19 ms | 250.87 / 302.62 ms | 286.29 / 318.04 ms | 0.66 / 12.73 / 23.12 |
 | FalkorDB | 891.77 | 24.41 / 31.99 ms | 24.64 / 28.67 ms | 25.20 / 31.34 ms | 22.98 / 26.14 ms | 47.67 / 63.42 ms | 17.01 / 48.05 / 14.29 |
 | TigerGraph | excluded | — | — | — | — | — | paid/non-comparable tier unavailable |
 
@@ -101,6 +101,8 @@ Free tiers may throttle, suspend, or share hardware. Cloud results include clien
 The completed CognoDB c0 run loaded 100,000 relationships in 185.77 seconds (538.29 relationships/s). Client-observed p50 read latencies were approximately 230–234 ms for the bounded traversal and lookup workloads, while the aggregation p50 was 407.97 ms. Mixed-workload throughput increased from 1.85 operations/s at concurrency 1 to 11.70 operations/s at concurrency 40, with a higher p95 at 40 concurrent clients. These are measurements from one run, not a cross-platform conclusion; the remaining targets must complete under documented comparable conditions before comparison.
 
 The completed FalkorDB run loaded 100,000 relationships in 112.14 seconds (891.77 relationships/s). Its bounded traversal and lookup p50 latencies were 23–25 ms, while aggregation p50 was 47.67 ms. Mixed-workload throughput peaked at 48.05 operations/s at concurrency 10 and declined at concurrency 40, a pattern consistent with saturation or shared-tier throttling. This is an observation from one client, one run, and non-identical instance resources; it is not a general product ranking.
+
+The completed Memgraph run loaded 100,000 relationships in 197.65 seconds (505.95 relationships/s). Its p50 traversal/lookup values were approximately 250 ms and aggregation p50 was 286.29 ms. Mixed-workload throughput rose from 0.66 operations/s at concurrency 1 to 23.12 operations/s at concurrency 40. Memgraph reported compatibility warnings that named constraint/index identifiers are ignored; the logical labels and properties used by the workload remained present. These results are still a single-run observation and must be interpreted with the documented service-tier differences.
 
 ## Security
 
