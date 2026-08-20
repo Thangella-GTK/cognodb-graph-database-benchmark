@@ -29,7 +29,7 @@ The same generated `data/nodes.csv` and `data/ratings.csv` inputs are used for e
 
 | Platform | Target tier / region | vCPU | RAM | Disk | Run status |
 |---|---|---:|---:|---:|---|
-| CognoDB | c0 / pending | 0.5 | 256 MB | 1 GB | credentials reset required |
+| CognoDB | c0 / region not recorded | 0.5 | 256 MB | 1 GB | completed |
 | Neo4j AuraDB | pending | pending | pending | pending | credentials required |
 | Memgraph Cloud | pending | pending | pending | pending | connection verification pending |
 | FalkorDB Cloud | pending | pending | pending | pending | endpoint verified; benchmark pending |
@@ -86,7 +86,7 @@ The orchestrator writes local evidence to `results/results.json`, followed by `r
 
 | Platform | Ingest rel/s | 1-hop p50/p95 | 2-hop p50/p95 | 3-hop p50/p95 | Lookup p50/p95 | Aggregation p50/p95 | Mixed ops/s (1/10/40) |
 |---|---:|---|---|---|---|---|---|
-| CognoDB | pending | pending | pending | pending | pending | pending | pending |
+| CognoDB | 538.29 | 229.99 / 252.76 ms | 234.51 / 257.49 ms | 234.31 / 239.95 ms | 230.17 / 234.49 ms | 407.97 / 480.64 ms | 1.85 / 10.47 / 11.70 |
 | Neo4j | pending | pending | pending | pending | pending | pending | pending |
 | Memgraph | pending | pending | pending | pending | pending | pending | pending |
 | FalkorDB | pending | pending | pending | pending | pending | pending | pending |
@@ -95,6 +95,10 @@ The orchestrator writes local evidence to `results/results.json`, followed by `r
 ## Limitations
 
 Free tiers may throttle, suspend, or share hardware. Cloud results include client-to-service network latency. Indexing, query syntax, and observability differ across providers. TigerGraph requires a graph schema, loading job, and stored RESTPP queries and its accessible workspace was not comparable to CognoDB c0. A missing or failed target is incomplete evidence, not a basis for inferring performance.
+
+## Initial observation
+
+The completed CognoDB c0 run loaded 100,000 relationships in 185.77 seconds (538.29 relationships/s). Client-observed p50 read latencies were approximately 230–234 ms for the bounded traversal and lookup workloads, while the aggregation p50 was 407.97 ms. Mixed-workload throughput increased from 1.85 operations/s at concurrency 1 to 11.70 operations/s at concurrency 40, with a higher p95 at 40 concurrent clients. These are measurements from one run, not a cross-platform conclusion; the remaining targets must complete under documented comparable conditions before comparison.
 
 ## Security
 
